@@ -43,6 +43,10 @@ module.exports = {
         return companyTicker + "As of " + lastUpdate + ", the stock price is $"
         + stockPrice;
     },
+    transferMoney: function(json){
+        const amountTransferred = json.objectCreated.amount
+        return ("You have transferred $" + amountTransferred + " to Mark's account")
+    },
     replyToUser: function(request, response, assistant, speech) {
         if(request.body.originalRequest && request.body.originalRequest.source == "google") { //for google assistant
             assistant.ask(speech + ". What else can I help you with?"); //assistant.tell will end the conversation
