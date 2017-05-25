@@ -63,7 +63,7 @@ app.post("/", function (request, response) {
   //Action name for Nessie
   const CONVERT_BALANCE_ACTION = "convertBalance";
   //Handler function for Nessie
-  function handleBalance(assistant) {
+  function handleConvertBalance(assistant) {
     //Perform networking call to Nessie API and speak result
     const CUSTOMER_ACCOUNT = "5925e8aba73e4942cdafd649"
     const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
@@ -83,6 +83,33 @@ app.post("/", function (request, response) {
       utilities.replyToUser(request, response, assistant, speech);
     });
   }
+  
+  //*****************************
+  // Transactions
+  //*****************************
+
+  //Action name for Nessie
+  const FIND_TRANSACTIONS = "findTransactions"
+  //Handler function for Nessie
+  function handleTransactions(assistant){
+    //Perform networking call to Nessie API and speak result
+    const CUSTOMER_ACCOUNT = "5925e8aba73e4942cdafd649"
+    const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
+    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/purchases?key="+ NESSIE_API_KEY;
+    httpRequest({
+      method: "GET",
+      uri: nessieAPIUrl,
+      json: true
+    }).then(function(json){
+      const speech = utilities.findTransactions(json);
+      utilities.replyToUser(request, response,assistant, speech);
+    })
+    .catch(function(err){
+      console.log("Eror:"+err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    });
+  }
 
 
   //create a map of potential actions that a user can trigger
@@ -91,6 +118,8 @@ app.post("/", function (request, response) {
   //for each action, set a mapping between the action name and the handler function
   actionMap.set(WELCOME_ACTION, handleWelcome);
   actionMap.set(CHECK_BALANCE_ACTION, handleBalance);
+  actionMap.set(CONVERT_BALANCE_ACTION, handleConvertBalance)
+  actionMap.set(FIND_TRANSACTIONS, handleTransactions);
 
   //register the action map with the assistant
   assistant.handleRequest(actionMap);
