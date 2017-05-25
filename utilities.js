@@ -9,27 +9,23 @@ module.exports = {
 
         switch(currency) {
           case "euros":
-            convertedBalance = parseFloat(balance*0.892295).toFixed(2)
+            convertedBalance = parseFloat(currentBalance*1.12051).toFixed(2)
             break;
           default:
-            convertedBalance = balance
+            convertedBalance = currentBalance
         }
 
-        return ("Your converted balance from $ is: " + convertedBalance + currency)
+        return ("Your converted balance from $ is: €" + convertedBalance )
     },
-    convertBalance: function (json) {
-        const balanceAmount = json.balance
-        return ("Your balance is $x" + balanceAmount)
-    },
-    findTransactions: function(json){
-        transAmount = json.amount
-        transDate = json.purchase_date
-        transDesc = json.description
+    findLastTransaction: function(json){
+        const transAmount = json[0].amount
+        const transDate = json[0].purchase_date
+        const transDesc = json[0].description
         if(transDesc != null){
-            return("Your last transaction was a purchase for "+ transDesc+" in the amout of $"+ transAmount+ "on"+transDate)
+            return("Your last transaction was a purchase for "+ transDesc + " in the amout of $"+ transAmount+ " on "+transDate)
         }
         else{
-            return("Your last transaction was a purchase for $"+ transAmount + "on" + transDate)
+            return("Your last transaction was a purchase for "+ transAmount + " " + "on" + " "+ transDate)
         }
         
     },
