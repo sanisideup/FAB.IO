@@ -56,6 +56,35 @@ app.post("/", function (request, response) {
     });
   }
 
+   // **************************
+  //  Convert to Euros
+  // **************************
+
+  //Action name for Nessie
+  const CONVERT_BALANCE_ACTION = "convertBalance";
+  //Handler function for Nessie
+  function handleBalance(assistant) {
+    //Perform networking call to Nessie API and speak result
+    const CUSTOMER_ACCOUNT = "5925e8aba73e4942cdafd649"
+    const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
+    //http://api.reimaginebanking.com/accounts/5925e8aba73e4942cdafd649?key=d5b7be3380bb6eb21f3c377b204f3ebc
+    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/" + CUSTOMER_ACCOUNT + "?key=" + NESSIE_API_KEY;
+    httpRequest({  
+      method: "GET",
+      uri: nessieAPIUrl,
+      json: true
+    }).then(function (json) {
+      const speech = utilities.findBalance(json);
+      utilities.replyToUser(request, response, assistant, speech);
+    })
+    .catch(function (err) {
+      console.log("Error:" + err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    });
+  }
+
+
   //create a map of potential actions that a user can trigger
   const actionMap = new Map();
 
