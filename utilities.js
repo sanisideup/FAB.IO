@@ -1,3 +1,4 @@
+const tickersData = require("./tickers.json");
 module.exports = {
     findBalance: function (json) {
         const balanceAmount = json.balance
@@ -22,12 +23,25 @@ module.exports = {
         const transDate = json[0].purchase_date
         const transDesc = json[0].description
         if(transDesc != null){
-            return("Your last transaction was a purchase for "+ transDesc + " in the amout of $"+ transAmount+ " on "+transDate)
+            return("Your last transaction was a purchase for "+ transDesc
+            + " in the amout of $"+ transAmount+ " on "+transDate)
         }
         else{
-            return("Your last transaction was a purchase for "+ transAmount + " " + "on" + " "+ transDate)
+            return("Your last transaction was a purchase for "+ transAmount
+            + " " + "on" + " "+ transDate)
         }
-        
+
+    },
+    findCompanyTicker: function(companyName) {
+      if(companyName in tickersData) {
+        return tickersData[companyName]
+      }
+    },
+    findStockPrice: function (companyTicker, json) {
+        const stockPrice = json.l
+        const lastUpdate = json.lt
+        return companyTicker + "As of " + lastUpdate + ", the stock price is $"
+        + stockPrice;
     },
     replyToUser: function(request, response, assistant, speech) {
         if(request.body.originalRequest && request.body.originalRequest.source == "google") { //for google assistant
