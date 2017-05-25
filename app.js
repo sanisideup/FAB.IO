@@ -190,6 +190,54 @@ app.post("/", function (request, response) {
       utilities.replyToUser(request, response, assistant, speech);
     });
   }
+  //*****************************
+  // Find Bill Action
+  //*****************************
+
+  //Action name for getting last transaction
+  const FIND_BILL = "findBill"
+  //Handler function for getting the last transaction
+  function handlefindBill(assistant) {
+    //Perform networking call to Nessie API and speak result
+    const CUSTOMER_ACCOUNT = "59273aa6ceb8abe24250de6f"
+    const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
+    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/bills?key="+ NESSIE_API_KEY;
+    httpRequest({
+      method: "GET",
+      uri: nessieAPIUrl,
+      json: true
+    }).then(function(json){
+      const speech = utilities.findLastTransaction(json);
+      utilities.replyToUser(request, response,assistant, speech);
+    })
+    .catch(function(err){
+      console.log("Eror:"+err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    });
+  }
+
+  const PAY_BILL = "payBill"
+  //Handler function for getting the last transaction
+  function handlepayBill(assistant) {
+    //Perform networking call to Nessie API and speak result
+    const CUSTOMER_ACCOUNT = "59273aa6ceb8abe24250de6f"
+    const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
+    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/bills?key="+ NESSIE_API_KEY;
+    httpRequest({
+      method: "GET",
+      uri: nessieAPIUrl,
+      json: true
+    }).then(function(json){
+      const speech = utilities.findLastTransaction(json);
+      utilities.replyToUser(request, response,assistant, speech);
+    })
+    .catch(function(err){
+      console.log("Eror:"+err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    });
+  }
 
   //create a map of potential actions that a user can trigger
   const actionMap = new Map();
@@ -199,6 +247,7 @@ app.post("/", function (request, response) {
   actionMap.set(CHECK_BALANCE_ACTION, handleCheckBalance);
   actionMap.set(CONVERT_BALANCE_ACTION, handleConvertBalance)
   actionMap.set(FIND_LAST_TRANSACTION_ACTION, handleLastTransaction);
+  actionMap.set(FIND_BILL, handlefindBill);
   actionMap.set(TRANSFER_MONEY_ACTION, handleTransferMoney)
   actionMap.set(FIND_CURRENT_STOCK_PRICE_ACTION, handleStockPrice);
 
