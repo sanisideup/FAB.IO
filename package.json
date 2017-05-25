@@ -15,6 +15,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/C1-SoftwareEngineeringSummit/team7"
+  },
   "author": "",
   "license": "ISC"
 }
