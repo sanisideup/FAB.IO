@@ -66,7 +66,7 @@ app.post("/", function (request, response) {
   const CONVERT_BALANCE_ACTION = "convertBalance";
   //Handler function for Nessie
   function handleConvertBalance(assistant) {
-    //1. Declare argument constant for user input (day of week)
+    //1. Declare argument constant for user input (currency)
     const CURRENCY_ARG = "currency";
     //2. Extract day of week from the assistant
     const currency = assistant.getArgument(CURRENCY_ARG).toLowerCase();
@@ -91,7 +91,7 @@ app.post("/", function (request, response) {
       utilities.replyToUser(request, response, assistant, speech);
     });
   }
-  
+
   //*****************************
   // Last Transaction Action
   //*****************************
@@ -110,6 +110,78 @@ app.post("/", function (request, response) {
       json: true
     }).then(function(json){
       const speech = utilities.findLastTransaction(json);
+      utilities.replyToUser(request, response,assistant, speech);
+    })
+    .catch(function(err){
+      console.log("Error:" + err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    });
+  }
+
+  ////*****************************
+  // Current Stock Price
+  //*****************************
+
+  //Action name for finding stock price
+  const FIND_CURRENT_STOCK_PRICE_ACTION = "currentStockPrice"
+  //1. Declare argument constant for user input (company name)
+  const CURRENCY_ARG = "companyName";
+  //2. Extract day of week from the assistant
+  const companyName = assistant.getArgument(CURRENCY_ARG).toLowerCase();
+  //Handler function for getting the last transaction
+  function handleStockPrice(assistant) {
+    companyTicker = utilities.findCompanyTicker(companyName)
+    //Extract company name and convert to ticker
+    const stockAPIUrl = "www.google.com/finance/info?infotype=infoquoteall&q="
+    + companyTicker;
+
+    httpRequest({
+      method: "GET",
+      uri: stockAPIUrl,
+      json: true
+    }).then(function(json){
+      const speech = utilities.findStockPrice(companyTicker, json);
+      utilities.replyToUser(request, response, assistant, speech);
+    })
+    .catch(function(err){
+      console.log("Error:" + err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    });
+  }
+
+  //*****************************
+  // Transfer Action
+  //*****************************
+
+  //Action name for getting last transaction
+  const TRANSFER_MONEY_ACTION = "transferMoney"
+  //Handler function for getting the last transaction
+  function handleTransferMoney(assistant) {
+    //Declare amount to be transferred (input from user)
+    const TRANSFER_AMOUNT_ARG = "transferAmount"
+
+    // Extract day of week from the assistant
+    const transferAmount = parseInt(assistant.getArgument(TRANSFER_AMOUNT_ARG));
+
+    //Perform networking call to Nessie API and speak result
+    const CUSTOMER_ACCOUNT = "5925e8aba73e4942cdafd649"
+    const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
+    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/transfers?key="+ NESSIE_API_KEY;
+    httpRequest({
+      method: "POST",
+      uri: nessieAPIUrl,
+      json: true,
+      body: {
+          "medium": "balance",
+          "payee_id": "59273aa6ceb8abe24250de6f",
+          "amount": transferAmount,
+          "transaction_date": "2017-05-25",
+          "description": "string"
+      }
+    }).then(function(json){
+      const speech = utilities.transferMoney(json);
       utilities.replyToUser(request, response,assistant, speech);
     })
     .catch(function(err){
@@ -176,6 +248,8 @@ app.post("/", function (request, response) {
   actionMap.set(CONVERT_BALANCE_ACTION, handleConvertBalance)
   actionMap.set(FIND_LAST_TRANSACTION_ACTION, handleLastTransaction);
   actionMap.set(FIND_BILL, handlefindBill);
+  actionMap.set(TRANSFER_MONEY_ACTION, handleTransferMoney)
+  actionMap.set(FIND_CURRENT_STOCK_PRICE_ACTION, handleStockPrice);
 
   //register the action map with the assistant
   assistant.handleRequest(actionMap);
