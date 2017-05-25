@@ -66,7 +66,7 @@ app.post("/", function (request, response) {
   const CONVERT_BALANCE_ACTION = "convertBalance";
   //Handler function for Nessie
   function handleConvertBalance(assistant) {
-    //1. Declare argument constant for user input (day of week)
+    //1. Declare argument constant for user input (currency)
     const CURRENCY_ARG = "currency";
     //2. Extract day of week from the assistant
     const currency = assistant.getArgument(CURRENCY_ARG).toLowerCase();
@@ -91,7 +91,7 @@ app.post("/", function (request, response) {
       utilities.replyToUser(request, response, assistant, speech);
     });
   }
-  
+
   //*****************************
   // Last Transaction Action
   //*****************************
@@ -113,7 +113,39 @@ app.post("/", function (request, response) {
       utilities.replyToUser(request, response,assistant, speech);
     })
     .catch(function(err){
-      console.log("Eror:"+err);
+      console.log("Error:" + err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    });
+  }
+
+  ////*****************************
+  // Current Stock Price
+  //*****************************
+
+  //Action name for finding stock price
+  const FIND_CURRENT_STOCK_PRICE_ACTION = "currentStockPrice"
+  //1. Declare argument constant for user input (company name)
+  const CURRENCY_ARG = "companyName";
+  //2. Extract day of week from the assistant
+  const companyName = assistant.getArgument(CURRENCY_ARG).toLowerCase();
+  //Handler function for getting the last transaction
+  function handleStockPrice(assistant) {
+    companyTicker = utilities.findCompanyTicker(companyName)
+    //Extract company name and convert to ticker
+    const stockAPIUrl = "www.google.com/finance/info?infotype=infoquoteall&q="
+    + companyTicker;
+
+    httpRequest({
+      method: "GET",
+      uri: stockAPIUrl,
+      json: true
+    }).then(function(json){
+      const speech = utilities.findStockPrice(companyTicker, json);
+      utilities.replyToUser(request, response, assistant, speech);
+    })
+    .catch(function(err){
+      console.log("Error:" + err);
       const speech = "I cannot understand that request. Ask me something else";
       utilities.replyToUser(request, response, assistant, speech);
     });
@@ -168,6 +200,7 @@ app.post("/", function (request, response) {
   actionMap.set(CONVERT_BALANCE_ACTION, handleConvertBalance)
   actionMap.set(FIND_LAST_TRANSACTION_ACTION, handleLastTransaction);
   actionMap.set(TRANSFER_MONEY_ACTION, handleTransferMoney)
+  actionMap.set(FIND_CURRENT_STOCK_PRICE_ACTION, handleStockPrice);
 
   //register the action map with the assistant
   assistant.handleRequest(actionMap);
