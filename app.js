@@ -220,16 +220,38 @@ app.post("/", function (request, response) {
   const PAY_BILL = "payBill"
   //Handler function for getting the last transaction
   function handlepayBill(assistant) {
+    const BILLPAY_AMOUNT_ARG = "billPayAmount"
+    const billPayAmount = parseInt(assistant.getArgument(BILLPAY_AMOUNT_ARG));
     //Perform networking call to Nessie API and speak result
-    const CUSTOMER_ACCOUNT = "59273aa6ceb8abe24250de6f"
+    const BILL_ID = "5927401bceb8abe24250de76"
     const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
-    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/bills?key="+ NESSIE_API_KEY;
+    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+ BILL_ID +"/bills?key="+ NESSIE_API_KEY;
+    const CUSTOMER_ACCOUNT = "59273aa6ceb8abe24250de6f"
+    const nessieAPIUrl1 = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/bills?key="+ NESSIE_API_KEY;
     httpRequest({
       method: "GET",
-      uri: nessieAPIUrl,
+      uri: nessieAPIUrl1,
       json: true
     }).then(function(json){
-      const speech = utilities.findLastTransaction(json);
+      const billAmount = utilities.getBillAmount(json);
+    })
+    .catch(function(err){
+      console.log("Eror:"+err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    })
+    httpRequest({
+      method: "POST",
+      uri: nessieAPIUrl,
+      json: true,
+      body: {
+          "status": "completed",
+          "payee": "Capital One Credit Card",
+          "payment_amount": (billAmount - billPayAmount),
+          "payment_date": "2017-05-25",
+      }
+    }).then(function(json, billPayAmount){
+      const speech = utilities.payBill(json, billPayAmount);
       utilities.replyToUser(request, response,assistant, speech);
     })
     .catch(function(err){
@@ -248,8 +270,9 @@ app.post("/", function (request, response) {
   actionMap.set(CONVERT_BALANCE_ACTION, handleConvertBalance)
   actionMap.set(FIND_LAST_TRANSACTION_ACTION, handleLastTransaction);
   actionMap.set(FIND_BILL, handlefindBill);
-  actionMap.set(TRANSFER_MONEY_ACTION, handleTransferMoney)
+  actionMap.set(TRANSFER_MONEY_ACTION, handleTransferMoney);
   actionMap.set(FIND_CURRENT_STOCK_PRICE_ACTION, handleStockPrice);
+  actionMap.set(PAY_BILL, handlepayBill);
 
   //register the action map with the assistant
   assistant.handleRequest(actionMap);
