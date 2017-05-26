@@ -9,17 +9,30 @@ module.exports = {
     },
     convertBalance: function(currency, json) {
         const currentBalance = json.balance
+        console.log(currentBalance)
         var convertedBalance
+        var currencySymbol
 
         switch (currency) {
             case "euros":
                 convertedBalance = parseFloat(currentBalance * 1.12051).toFixed(2)
-                break;
+                currencySymbol = "€"
+                break
+            case "yen":
+                convertedBalance = parseFloat(currentBalance * 111.476).toFixed(2)
+                currencySymbol = "¥"
+                break
+            case "pounds":
+            case "sterling":
+            case "pounds sterling":
+                convertedBalance = parseFloat(currentBalance * 0.7768).toFixed(2)
+                currencySymbol = "£"
+                break
             default:
                 convertedBalance = currentBalance
         }
 
-        return ("Your converted balance from $ is: €" + convertedBalance)
+        return ("Your converted balance from $ is: " + currencySymbol +  convertedBalance)
     },
     findLastTransaction: function(json) {
         const transAmount = json[0].amount
@@ -50,7 +63,8 @@ module.exports = {
         return ("You have transferred $" + amountTransferred + " to Mark's account")
     },
     saveMoney: function(json) {
-        const transactionAmount;
+        console.log(json)
+        const transactionAmount = 0;
         var hash = {}
         var category
 
@@ -71,9 +85,9 @@ module.exports = {
 
         var maxCategoryAmount = hash.health.toString()
 
-        return "In the last month, you've spent a grand total of "
-        + maxCategoryAmount + "on " + maxCategory + ". This was your highest "
-        + "expense." + financeTips[maxCategory]
+        return "In the last month, you've spent a grand total of $"
+        + maxCategoryAmount + " on " + maxCategory + ". This was your highest "
+        + "expense. " + financeTips[maxCategory]
     },
     findBill: function(json){
         const status = json[0].status

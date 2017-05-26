@@ -187,7 +187,7 @@ app.post("/", function (request, response) {
       utilities.replyToUser(request, response,assistant, speech);
     })
     .catch(function(err){
-      console.log("Eror:" + err);
+      console.log("Error:" + err);
       const speech = "I cannot understand that request. Ask me something else";
       utilities.replyToUser(request, response, assistant, speech);
     });
@@ -221,13 +221,14 @@ app.post("/", function (request, response) {
 
   const PAY_BILL = "payBill"
   //Handler function for getting the last transaction
-  function handlepayBill(assistant) {
+  function handlePayBill(assistant) {
     const BILLPAY_AMOUNT_ARG = "billPayAmount"
     const billPayAmount = parseInt(assistant.getArgument(BILLPAY_AMOUNT_ARG));
     //Perform networking call to Nessie API and speak result
+    var billAmount = 0;
     const BILL_ID = "5927401bceb8abe24250de76"
     const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
-    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+ BILL_ID +"/bills?key="+ NESSIE_API_KEY;
+    const nessieAPIUrl = "http://api.reimaginebanking.com/bills/"+ BILL_ID +"?key="+ NESSIE_API_KEY;
     const CUSTOMER_ACCOUNT = "59273aa6ceb8abe24250de6f"
     const nessieAPIUrl1 = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/bills?key="+ NESSIE_API_KEY;
     httpRequest({
@@ -235,7 +236,7 @@ app.post("/", function (request, response) {
       uri: nessieAPIUrl1,
       json: true
     }).then(function(json){
-      const billAmount = utilities.getBillAmount(json);
+      billAmount = utilities.getBillAmount(json);
     })
     .catch(function(err){
       console.log("Eror:"+err);
@@ -243,13 +244,13 @@ app.post("/", function (request, response) {
       utilities.replyToUser(request, response, assistant, speech);
     })
     httpRequest({
-      method: "POST",
+      method: "PUT",
       uri: nessieAPIUrl,
       json: true,
       body: {
           "status": "completed",
           "payee": "Capital One Credit Card",
-          "payment_amount": (billAmount - billPayAmount),
+          "payment_amount": parseFloat(billAmount - billPayAmount),
           "payment_date": "2017-05-25",
       }
     }).then(function(json, billPayAmount){
@@ -257,7 +258,7 @@ app.post("/", function (request, response) {
       utilities.replyToUser(request, response,assistant, speech);
     })
     .catch(function(err){
-      console.log("Eror:"+err);
+      console.log("Error:" + err);
       const speech = "I cannot understand that request. Ask me something else";
       utilities.replyToUser(request, response, assistant, speech);
     });
@@ -273,9 +274,8 @@ app.post("/", function (request, response) {
     //Perform networking call to Nessie API and speak result
     const CUSTOMER_ACCOUNT = "5925e8aba73e4942cdafd649"
     const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
-    //http://api.reimaginebanking.com/accounts/5925e8aba73e4942cdafd649?key=d5b7be3380bb6eb21f3c377b204f3ebc
-    const saveMoneyAPIUrl = "http://api.reimaginebanking.com/accounts/"
-    + CUSTOMER_ACCOUNT + "?key=" + NESSIE_API_KEY;
+    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"
+    + CUSTOMER_ACCOUNT + "/purchases?key=" + NESSIE_API_KEY;
 
     httpRequest({
       method: "GET",
@@ -286,7 +286,7 @@ app.post("/", function (request, response) {
       utilities.replyToUser(request, response, assistant, speech);
     })
     .catch(function(err){
-      console.log("Eror:" + err);
+      console.log("Error:" + err);
       const speech = "I cannot understand that request. Ask me something else";
       utilities.replyToUser(request, response, assistant, speech);
     });
@@ -299,11 +299,11 @@ app.post("/", function (request, response) {
   actionMap.set(CHECK_BALANCE_ACTION, handleCheckBalance);
   actionMap.set(CONVERT_BALANCE_ACTION, handleConvertBalance)
   actionMap.set(FIND_LAST_TRANSACTION_ACTION, handleLastTransaction);
-  actionMap.set(SAVE_ACTION, handleStockPrice);
+  actionMap.set(SAVE_MONEY_ACTION, handleSaveMoney);
   actionMap.set(CURRENT_STOCK_PRICE_ACTION, handleStockPrice);
-  actionMap.set(FIND_BILL, handlefindBill);
+  actionMap.set(FIND_BILL, handleFindBill);
   actionMap.set(TRANSFER_MONEY_ACTION, handleTransferMoney);
-  actionMap.set(PAY_BILL, handlepayBill);
+  actionMap.set(PAY_BILL, handlePayBill);
 
   //Register the action map with the assistant
   assistant.handleRequest(actionMap);
