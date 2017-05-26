@@ -70,6 +70,7 @@ app.post("/", function (request, response) {
     const CURRENCY_ARG = "currency";
     //2. Extract day of week from the assistant
     const currency = assistant.getArgument(CURRENCY_ARG).toLowerCase();
+    console.log(currency)
     //3. Perform networking call to Nessie API and speak result
     const CUSTOMER_ACCOUNT = "5925e8aba73e4942cdafd649"
     const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
@@ -121,22 +122,22 @@ app.post("/", function (request, response) {
     });
   }
 
-  ////*****************************
+  //*****************************
   // Current Stock Price
   //*****************************
 
   //Action name for finding stock price
-  const FIND_CURRENT_STOCK_PRICE_ACTION = "currentStockPrice"
-  //1. Declare argument constant for user input (company name)
-  const CURRENCY_ARG = "companyName";
-  //2. Extract day of week from the assistant
-  const companyName = assistant.getArgument(CURRENCY_ARG).toLowerCase();
+  const CURRENT_STOCK_PRICE_ACTION = "currentStockPrice"
   //Handler function for getting the last transaction
   function handleStockPrice(assistant) {
-    companyTicker = utilities.findCompanyTicker(companyName)
+    //1. Declare argument constant for user input (company name)
+    const COMPANY_NAME_ARG = "companyName";
+    //2. Extract day of week from the assistant
+    const companyName = assistant.getArgument(COMPANY_NAME_ARG).toLowerCase();
+    const companyTicker = utilities.findCompanyTicker(companyName);
+
     //Extract company name and convert to ticker
-    const stockAPIUrl = "www.google.com/finance/info?infotype=infoquoteall&q="
-    + companyTicker;
+    const stockAPIUrl = "http://www.quandl.com/api/v3/datatables/WIKI/PRICES.json?date=20170525&ticker=" + companyTicker + "&api_key=xyrBzPSyVzqturdzFyKZ";
 
     httpRequest({
       method: "GET",
@@ -176,7 +177,7 @@ app.post("/", function (request, response) {
       json: true,
       body: {
           "medium": "balance",
-          "payee_id": "59273aa6ceb8abe24250de6f",
+          "payee_id": "59275453ceb8abe24250de9c",
           "amount": transferAmount,
           "transaction_date": "2017-05-25",
           "description": ""
@@ -187,6 +188,76 @@ app.post("/", function (request, response) {
     })
     .catch(function(err){
       console.log("Eror:" + err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    });
+  }
+  //*****************************
+  // Find Bill Action
+  //*****************************
+
+  //Action name for getting last transaction
+  const FIND_BILL = "findBill"
+  //Handler function for getting the last transaction
+  function handleFindBill(assistant) {
+    //Perform networking call to Nessie API and speak result
+    const CUSTOMER_ACCOUNT = "59273aa6ceb8abe24250de6f"
+    const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
+    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/bills?key="+ NESSIE_API_KEY;
+    httpRequest({
+      method: "GET",
+      uri: nessieAPIUrl,
+      json: true
+    }).then(function(json){
+      const speech = utilities.findLastTransaction(json);
+      utilities.replyToUser(request, response,assistant, speech);
+    })
+    .catch(function(err){
+      console.log("Eror:"+err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    });
+  }
+
+  const PAY_BILL = "payBill"
+  //Handler function for getting the last transaction
+  function handlepayBill(assistant) {
+    const BILLPAY_AMOUNT_ARG = "billPayAmount"
+    const billPayAmount = parseInt(assistant.getArgument(BILLPAY_AMOUNT_ARG));
+    //Perform networking call to Nessie API and speak result
+    const BILL_ID = "5927401bceb8abe24250de76"
+    const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
+    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+ BILL_ID +"/bills?key="+ NESSIE_API_KEY;
+    const CUSTOMER_ACCOUNT = "59273aa6ceb8abe24250de6f"
+    const nessieAPIUrl1 = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/bills?key="+ NESSIE_API_KEY;
+    httpRequest({
+      method: "GET",
+      uri: nessieAPIUrl1,
+      json: true
+    }).then(function(json){
+      const billAmount = utilities.getBillAmount(json);
+    })
+    .catch(function(err){
+      console.log("Eror:"+err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    })
+    httpRequest({
+      method: "POST",
+      uri: nessieAPIUrl,
+      json: true,
+      body: {
+          "status": "completed",
+          "payee": "Capital One Credit Card",
+          "payment_amount": (billAmount - billPayAmount),
+          "payment_date": "2017-05-25",
+      }
+    }).then(function(json, billPayAmount){
+      const speech = utilities.payBill(json, billPayAmount);
+      utilities.replyToUser(request, response,assistant, speech);
+    })
+    .catch(function(err){
+      console.log("Eror:"+err);
       const speech = "I cannot understand that request. Ask me something else";
       utilities.replyToUser(request, response, assistant, speech);
     });
@@ -228,9 +299,11 @@ app.post("/", function (request, response) {
   actionMap.set(CHECK_BALANCE_ACTION, handleCheckBalance);
   actionMap.set(CONVERT_BALANCE_ACTION, handleConvertBalance)
   actionMap.set(FIND_LAST_TRANSACTION_ACTION, handleLastTransaction);
-  actionMap.set(TRANSFER_MONEY_ACTION, handleTransferMoney)
-  actionMap.set(FIND_CURRENT_STOCK_PRICE_ACTION, handleStockPrice);
   actionMap.set(SAVE_ACTION, handleStockPrice);
+  actionMap.set(CURRENT_STOCK_PRICE_ACTION, handleStockPrice);
+  actionMap.set(FIND_BILL, handlefindBill);
+  actionMap.set(TRANSFER_MONEY_ACTION, handleTransferMoney);
+  actionMap.set(PAY_BILL, handlepayBill);
 
   //Register the action map with the assistant
   assistant.handleRequest(actionMap);

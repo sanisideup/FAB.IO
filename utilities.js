@@ -1,5 +1,6 @@
-const tickersData = require("./tickers.json");
+
 const financeTips = require("./financeTips.json");
+const tickersData = require("./companyTickers.json");
 
 module.exports = {
     findBalance: function(json) {
@@ -34,15 +35,15 @@ module.exports = {
 
     },
     findCompanyTicker: function(companyName) {
-        if (companyName in tickersData) {
-            return tickersData[companyName]
+        if(companyName in tickersData[0]) {
+            return tickersData[0][companyName]
+        } else {
+          return nil
         }
     },
-    findStockPrice: function(companyTicker, json) {
-        const stockPrice = json.l
-        const lastUpdate = json.lt
-        return companyTicker + "As of " + lastUpdate + ", the stock price is $" +
-            stockPrice;
+    findStockPrice: function (companyTicker, json) {
+        const stockPrice = json.datatable.data[0][5]
+        return "As of today, the stock price is $" + stockPrice;
     },
     transferMoney: function(json) {
         const amountTransferred = json.objectCreated.amount
@@ -73,6 +74,24 @@ module.exports = {
         return "In the last month, you've spent a grand total of "
         + maxCategoryAmount + "on " + maxCategory + ". This was your highest "
         + "expense." + financeTips[maxCategory]
+    },
+    findBill: function(json){
+        const status = json[0].status
+        const payee = json[0].payee
+        const payment_date = json[0].payment_date
+        const payment_amount = json[0].payment_amount
+        const recurring_date= json[0].recurring_date
+        return ("Your " + payee + " bill is due on"+ payment_date+" in the amount of $"+ payment_amount+". This bill reoccurs on the "+ recurring_date +"st of every month")
+    },
+    getBillAmount: function(json){
+        const payment_amount = json[0].payment_amount
+        return (payment_amount)
+    },
+    payBill: function(json, billPayAmount){
+        const status = json[0].status
+        const payee = json[0].payee
+        const payment_amount = json[0].payment_amount - billPayAmount
+        return ("$"+billPayAmount+" has been applied to your " + payee + " bill. Your balance due is now $"+ payment_amount)
     },
     replyToUser: function(request, response, assistant, speech) {
         if (request.body.originalRequest && request.body.originalRequest.source == "google") { //for google assistant
