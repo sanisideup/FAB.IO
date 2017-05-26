@@ -1,15 +1,15 @@
 [
     {
-        "Apple": "AAPL",
-        "Amazon": "AMZN",
-        "Berkshire Hathaway": "BRK.B",
-        "Capital One": "COF",
-        "Walt Disney": "DIS",
-        "Facebook": "FB",
-        "Google": "GOOGL",
-        "Microsoft": "MSFT",
-        "Starbucks": "SBUX",
-        "Intel": "INTC",
-        "Oracle": "ORCL"
+        "apple": "AAPL",
+        "amazon": "AMZN",
+        "berkshire hathaway": "BRK.B",
+        "capital one": "COF",
+        "walt disney": "DIS",
+        "facebook": "FB",
+        "google": "GOOGL",
+        "microsoft": "MSFT",
+        "starbucks": "SBUX",
+        "intel": "INTC",
+        "oracle": "ORCL"
     }
 ]

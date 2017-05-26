@@ -70,6 +70,7 @@ app.post("/", function (request, response) {
     const CURRENCY_ARG = "currency";
     //2. Extract day of week from the assistant
     const currency = assistant.getArgument(CURRENCY_ARG).toLowerCase();
+    console.log(currency)
     //3. Perform networking call to Nessie API and speak result
     const CUSTOMER_ACCOUNT = "5925e8aba73e4942cdafd649"
     const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
@@ -119,22 +120,22 @@ app.post("/", function (request, response) {
     });
   }
 
-  ////*****************************
+  //*****************************
   // Current Stock Price
   //*****************************
 
   //Action name for finding stock price
-  const FIND_CURRENT_STOCK_PRICE_ACTION = "currentStockPrice"
-  //1. Declare argument constant for user input (company name)
-  const CURRENCY_ARG = "companyName";
-  //2. Extract day of week from the assistant
-  const companyName = assistant.getArgument(CURRENCY_ARG).toLowerCase();
+  const CURRENT_STOCK_PRICE_ACTION = "currentStockPrice"
   //Handler function for getting the last transaction
   function handleStockPrice(assistant) {
-    companyTicker = utilities.findCompanyTicker(companyName)
+    //1. Declare argument constant for user input (company name)
+    const COMPANY_NAME_ARG = "companyName";
+    //2. Extract day of week from the assistant
+    const companyName = assistant.getArgument(COMPANY_NAME_ARG).toLowerCase();
+    const companyTicker = utilities.findCompanyTicker(companyName);
+
     //Extract company name and convert to ticker
-    const stockAPIUrl = "www.google.com/finance/info?infotype=infoquoteall&q="
-    + companyTicker;
+    const stockAPIUrl = "http://www.quandl.com/api/v3/datatables/WIKI/PRICES.json?date=20170525&ticker=" + companyTicker + "&api_key=xyrBzPSyVzqturdzFyKZ";
 
     httpRequest({
       method: "GET",
@@ -197,7 +198,7 @@ app.post("/", function (request, response) {
   //Action name for getting last transaction
   const FIND_BILL = "findBill"
   //Handler function for getting the last transaction
-  function handlefindBill(assistant) {
+  function handleFindBill(assistant) {
     //Perform networking call to Nessie API and speak result
     const CUSTOMER_ACCOUNT = "59273aa6ceb8abe24250de6f"
     const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
@@ -219,7 +220,7 @@ app.post("/", function (request, response) {
 
   const PAY_BILL = "payBill"
   //Handler function for getting the last transaction
-  function handlepayBill(assistant) {
+  function handlePayBill(assistant) {
     //Perform networking call to Nessie API and speak result
     const CUSTOMER_ACCOUNT = "59273aa6ceb8abe24250de6f"
     const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
@@ -247,9 +248,9 @@ app.post("/", function (request, response) {
   actionMap.set(CHECK_BALANCE_ACTION, handleCheckBalance);
   actionMap.set(CONVERT_BALANCE_ACTION, handleConvertBalance)
   actionMap.set(FIND_LAST_TRANSACTION_ACTION, handleLastTransaction);
-  actionMap.set(FIND_BILL, handlefindBill);
+  actionMap.set(FIND_BILL, handleFindBill);
   actionMap.set(TRANSFER_MONEY_ACTION, handleTransferMoney)
-  actionMap.set(FIND_CURRENT_STOCK_PRICE_ACTION, handleStockPrice);
+  actionMap.set(CURRENT_STOCK_PRICE_ACTION, handleStockPrice);
 
   //register the action map with the assistant
   assistant.handleRequest(actionMap);
