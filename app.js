@@ -26,7 +26,7 @@ app.post("/", function (request, response) {
 
   //handler function for welcome
   function handleWelcome (assistant) { //for Google Assistant only
-    assistant.ask("Hi, I'm software summit bot - ask me a question!");
+    assistant.ask("Hi, I'm fabio - ask me a question!");
   }
 
   // **************************
@@ -167,7 +167,7 @@ app.post("/", function (request, response) {
     //1. Declare amount to be transferred (input from user)
     const TRANSFER_AMOUNT_ARG = "transferAmount"
     //2. Extract day of week from the assistant
-    const transferAmount = parseInt(assistant.getArgument(TRANSFER_AMOUNT_ARG));
+    const transferAmount = parseFloat(assistant.getArgument(TRANSFER_AMOUNT_ARG));
     //3. Perform networking call to Nessie API and speak result
     const CUSTOMER_ACCOUNT = "5925e8aba73e4942cdafd649"
     const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
@@ -182,7 +182,7 @@ app.post("/", function (request, response) {
           "payee_id": "59275453ceb8abe24250de9c",
           "amount": transferAmount,
           "transaction_date": "2017-05-25",
-          "description": ""
+          "description": "string"
       }
     }).then(function(json){
       const speech = utilities.transferMoney(json);
@@ -194,6 +194,7 @@ app.post("/", function (request, response) {
       utilities.replyToUser(request, response, assistant, speech);
     });
   }
+
   //*****************************
   // Find Bill Action
   //*****************************
@@ -211,7 +212,7 @@ app.post("/", function (request, response) {
       uri: nessieAPIUrl,
       json: true
     }).then(function(json){
-      const speech = utilities.findLastTransaction(json);
+      const speech = utilities.findBill(json);
       utilities.replyToUser(request, response,assistant, speech);
     })
     .catch(function(err){
@@ -221,46 +222,27 @@ app.post("/", function (request, response) {
     });
   }
 
+  //*****************************
+  // Pay Bill Action
+  //*****************************
+
   const PAY_BILL = "payBill"
   //Handler function for getting the last transaction
   function handlePayBill(assistant) {
-    const BILLPAY_AMOUNT_ARG = "billPayAmount"
-    const billPayAmount = parseInt(assistant.getArgument(BILLPAY_AMOUNT_ARG));
-    //Perform networking call to Nessie API and speak result
-    var billAmount = 0;
-    const BILL_ID = "5927401bceb8abe24250de76"
-    const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
-    const nessieAPIUrl = "http://api.reimaginebanking.com/bills/"+ BILL_ID +"?key="+ NESSIE_API_KEY;
+     //Perform networking call to Nessie API and speak result
     const CUSTOMER_ACCOUNT = "59273aa6ceb8abe24250de6f"
-    const nessieAPIUrl1 = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/bills?key="+ NESSIE_API_KEY;
+    const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
+    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/bills?key="+ NESSIE_API_KEY;
     httpRequest({
       method: "GET",
-      uri: nessieAPIUrl1,
+      uri: nessieAPIUrl,
       json: true
     }).then(function(json){
-      billAmount = utilities.getBillAmount(json);
-    })
-    .catch(function(err){
-      console.log("Eror:"+err);
-      const speech = "I cannot understand that request. Ask me something else";
-      utilities.replyToUser(request, response, assistant, speech);
-    })
-    httpRequest({
-      method: "PUT",
-      uri: nessieAPIUrl,
-      json: true,
-      body: {
-          "status": "completed",
-          "payee": "Capital One Credit Card",
-          "payment_amount": parseFloat(billAmount - billPayAmount),
-          "payment_date": "2017-05-25",
-      }
-    }).then(function(json, billPayAmount){
-      const speech = utilities.payBill(json, billPayAmount);
+      const speech = utilities.payBill(json);
       utilities.replyToUser(request, response,assistant, speech);
     })
     .catch(function(err){
-      console.log("Error:" + err);
+      console.log("Eror:"+err);
       const speech = "I cannot understand that request. Ask me something else";
       utilities.replyToUser(request, response, assistant, speech);
     });

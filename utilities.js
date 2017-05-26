@@ -7,13 +7,13 @@ module.exports = {
     findBalance: function(json) {
         const balanceAmount = json.balance
         var speech = ("Your balance is $" + balanceAmount)
-        
+
+        console.log("findBalance hit")
         say.speak(speech)
         return speech;
     },
     convertBalance: function(currency, json) {
         const currentBalance = json.balance
-        console.log(currentBalance)
         var convertedBalance
         var currencySymbol
 
@@ -27,6 +27,8 @@ module.exports = {
                 currencySymbol = "¥"
                 break
             case "pounds":
+                convertedBalance = parseFloat(currentBalance * 0.7768).toFixed(2)
+                currencySymbol = "£"
             case "sterling":
             case "pounds sterling":
                 convertedBalance = parseFloat(currentBalance * 0.7768).toFixed(2)
@@ -38,6 +40,7 @@ module.exports = {
 
         var speech = ("Your converted balance from $ is: " + currencySymbol +  convertedBalance)
         
+        console.log("convertBalance hit")
         say.speak(speech)
         return speech
     },
@@ -45,6 +48,7 @@ module.exports = {
         const transAmount = json[0].amount
         const transDate = json[0].purchase_date
         const transDesc = json[0].description
+        console.log("findLastTransaction hit")
         var speech = ""
         if (transDesc != null) {
             speech = ("Your last transaction was a purchase for " + transDesc +
@@ -69,17 +73,20 @@ module.exports = {
     findStockPrice: function (companyName, companyTicker, json) {
         const stockPrice = json.datatable.data[0][5]
         var speech = ("As of today, the stock price of " + companyName + " is $" + stockPrice)
+        
+        console.log("findStockPrice hit")
         say.speak(speech)
         return speech
     },
     transferMoney: function(json) {
         const amountTransferred = json.objectCreated.amount
         var speech = ("You have transferred $" + amountTransferred + " to Mark's account")
+        
+        console.log("transferMoney hit")
         say.speak(speech)
         return speech
     },
     saveMoney: function(json) {
-        console.log(json)
         const transactionAmount = 0;
         var hash = {}
         var category
@@ -105,6 +112,7 @@ module.exports = {
         + maxCategoryAmount + " on " + maxCategory + ". This was your highest "
         + "expense. " + financeTips[maxCategory])
 
+        console.log("saveMoney hit")
         say.speak(speech)
         return speech
     },
@@ -114,21 +122,23 @@ module.exports = {
         const payment_date = json[0].payment_date
         const payment_amount = json[0].payment_amount
         const recurring_date= json[0].recurring_date
-        var speech = ("Your " + payee + " bill is due on"+ payment_date+" in the amount of $"+ payment_amount+". This bill reoccurs on the "+ recurring_date +"st of every month")
+        var speech = ("You have one bill due. Your " + payee + " bill is due on "+ payment_date+" in the amount of $"+ payment_amount+". This bill reoccurs on the "+ recurring_date +"st of every month.")
+       
+        console.log("findBill hit")
         say.speak(speech)
         return speech;
     },
-    getBillAmount: function(json){
-        const payment_amount = json[0].payment_amount
-        return (payment_amount)
-    },
-    payBill: function(json, billPayAmount){
+    payBill: function(json){
         const status = json[0].status
         const payee = json[0].payee
-        const payment_amount = json[0].payment_amount - billPayAmount
-        var speech =  ("$"+billPayAmount+" has been applied to your " + payee + " bill. Your balance due is now $"+ payment_amount)
+        const payment_date = json[0].payment_date
+        const payment_amount = json[0].payment_amount
+        const recurring_date= json[0].recurring_date
+        var speech = "$" + payment_amount + ".00 has been applied to your Capital One Credit Card bill. Your amount due is now $0.00.";
+       
+        console.log("findBill hit")
         say.speak(speech)
-        return speech
+        return speech;
     },
 
     replyToUser: function(request, response, assistant, speech) {
