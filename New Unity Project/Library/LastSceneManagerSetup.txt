@@ -1,0 +1,4 @@
+sceneSetups:
+- path: C:/Users/Staudy/Downloads/Finalmarco_Text2Speech/Assets/text2speech.unity
+  isLoaded: 1
+  isActive: 1

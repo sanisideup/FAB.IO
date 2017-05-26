@@ -1,0 +1,6 @@
+Copyright (c) Garpix Ltd. All rights reserved.
+
+License: Asset Store Terms of Service and EULA
+License URI: https://unity3d.com/ru/legal/as_terms
+
+For support use email support@garpix.com.
