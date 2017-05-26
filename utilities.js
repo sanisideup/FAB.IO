@@ -52,7 +52,7 @@ module.exports = {
         var speech = ""
         if (transDesc != null) {
             speech = ("Your last transaction was a purchase for " + transDesc +
-                " in the amout of $" + transAmount + " on " + transDate);
+                " in the amount of $" + transAmount + " on " + transDate);
             say.speak(speech)
             return speech
         } else {
