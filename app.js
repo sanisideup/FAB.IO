@@ -8,6 +8,7 @@ const httpRequest = require("request-promise");
 require("string_score");
 const utilities = require("./utilities.js"); //utility functions
 const app = express();
+
 app.set("port", (process.env.PORT || 8080));
 app.use(bodyParser.json({type: "application/json"}));
 
@@ -49,6 +50,7 @@ app.post("/", function (request, response) {
       json: true
     }).then(function (json) {
       const speech = utilities.findBalance(json);
+      
       utilities.replyToUser(request, response, assistant, speech);
     })
     .catch(function (err) {
@@ -144,7 +146,7 @@ app.post("/", function (request, response) {
       uri: stockAPIUrl,
       json: true
     }).then(function(json){
-      const speech = utilities.findStockPrice(companyTicker, json);
+      const speech = utilities.findStockPrice(companyName, companyTicker, json);
       utilities.replyToUser(request, response, assistant, speech);
     })
     .catch(function(err){
