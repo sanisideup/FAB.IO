@@ -1,4 +1,5 @@
-const tickersData = require("./tickers.json");
+const tickersData = require("./companyTickers.json");
+
 module.exports = {
     findBalance: function (json) {
         const balanceAmount = json.balance
@@ -33,15 +34,15 @@ module.exports = {
 
     },
     findCompanyTicker: function(companyName) {
-      if(companyName in tickersData) {
-        return tickersData[companyName]
-      }
+        if(companyName in tickersData[0]) {
+            return tickersData[0][companyName]
+        } else {
+          return nil
+        }
     },
     findStockPrice: function (companyTicker, json) {
-        const stockPrice = json.l
-        const lastUpdate = json.lt
-        return companyTicker + "As of " + lastUpdate + ", the stock price is $"
-        + stockPrice;
+        const stockPrice = json.datatable.data[0][5]
+        return "As of today, the stock price is $" + stockPrice;
     },
     transferMoney: function(json){
         const amountTransferred = json.objectCreated.amount
