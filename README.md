@@ -18,3 +18,10 @@ This was built within 24 hours during a Hackathon for Capital One's May 2017 Sof
 - [Node.js](https://nodejs.org/)
 - [Nessie API](http://api.reimaginebanking.com/)
 - [Quandl API](https://www.quandl.com/)
+
+## Partial List of Accepted Commands 
+
+- "Check my balance" 
+- "What was my last purchase"
+- "What is the stock price of..." (Google, Facebook, etc.) 
+- "Save me money" 
