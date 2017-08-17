@@ -25,3 +25,7 @@ This was built within 24 hours during a Hackathon for Capital One's May 2017 Sof
 - "What was my last purchase"
 - "What is the stock price of..." (Google, Facebook, etc.) 
 - "Save me money" 
+
+## Pitch Deck 
+
+https://drive.google.com/open?id=1u_pbiG-dBNeNY6JQht_Um7Sg0HwTLWhk4DOrMWv2T4E
